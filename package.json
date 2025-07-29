@@ -1,0 +1,26 @@
+{
+  "name": "gamified-life-monorepo",
+  "private": true,
+  "packageManager": "pnpm@8",
+  "workspaces": [
+    "apps/api",
+    "apps/mobile"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter gamified-life-api... --filter gamified-life-mobile... --parallel run dev",
+    "dev:api": "pnpm --filter gamified-life-api dev",
+    "dev:mobile": "pnpm --filter gamified-life-mobile start",
+    "build:api": "pnpm --filter gamified-life-api build",
+    "build:mobile": "pnpm --filter gamified-life-mobile build",
+    "install:all": "pnpm install",
+    "clean": "pnpm -r exec rm -rf node_modules && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+} 

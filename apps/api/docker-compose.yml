@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: gamified
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  api:
+    build: .
+    ports: ["4000:4000"]
+    environment:
+      DATABASE_PROVIDER: "postgresql"
+      DATABASE_URL: "postgresql://app:app@db:5432/gamified"
+      JWT_SECRET: "replace_me"
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    depends_on: [db]
+volumes:
+  db-data:
