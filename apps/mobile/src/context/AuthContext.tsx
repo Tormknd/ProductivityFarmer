@@ -39,6 +39,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Set mock user if using mock token
           if (storedToken === "mock-jwt-token-for-testing") {
             setUser(MOCK_USER);
+          } else {
+            // For real tokens, set a basic user object
+            setUser({
+              id: "user-from-token",
+              email: "user@example.com",
+              name: "User",
+              xp: 0
+            });
           }
         }
       } catch (error) {
@@ -53,6 +61,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (newToken: string) => {
     setToken(newToken);
     await SecureStore.setItemAsync("token", newToken);
+    // Set basic user when logging in
+    setUser({
+      id: "user-from-token",
+      email: "user@example.com", 
+      name: "User",
+      xp: 0
+    });
   };
 
   const loginWithMockUser = async () => {

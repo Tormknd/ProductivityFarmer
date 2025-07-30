@@ -40,6 +40,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 app.use("/auth", authRouter);
 app.use("/tasks", tasksRouter);
 app.use("/meals", mealsRouter);
@@ -48,4 +53,9 @@ app.use("/xp", xpRouter);
 app.use("/chat", chatRouter);
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`API listening on ${port}`));
+app.listen(port, "0.0.0.0", () => {
+  console.log(`🚀 API server running on port ${port}`);
+  console.log(`📍 Local: http://localhost:${port}`);
+  console.log(`🌐 Network: http://10.139.19.193:${port}`);
+  console.log(`🔍 Health check: http://10.139.19.193:${port}/health`);
+});

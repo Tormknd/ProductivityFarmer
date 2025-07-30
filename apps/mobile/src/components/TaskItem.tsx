@@ -1,6 +1,5 @@
-import { View, Text, Pressable } from "react-native";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useApi } from "../api/client";
+import { View, Text, Pressable, Alert } from "react-native";
+import { useCompleteTask, useDeleteTask } from "../api/tasks";
 import { Task } from "../types";
 
 interface TaskItemProps {
@@ -8,40 +7,70 @@ interface TaskItemProps {
 }
 
 export default function TaskItem({ task }: TaskItemProps) {
-  const api = useApi();
-  const qc = useQueryClient();
-  const complete = useMutation({
-    mutationFn: () => api.put(`/tasks/${task.id}/complete`).then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] })
-  });
+  const completeTask = useCompleteTask();
+  const deleteTask = useDeleteTask();
+
+  const handleComplete = () => {
+    if (!task.completed) {
+      completeTask.mutate(task.id);
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Task",
+      `Are you sure you want to delete "${task.title}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: () => deleteTask.mutate(task.id) }
+      ]
+    );
+  };
 
   return (
-    <Pressable 
-      onPress={() => complete.mutate()} 
-      style={{ 
-        marginBottom: 8, 
-        padding: 16, 
-        backgroundColor: '#1E1E1E', 
-        borderRadius: 16,
-        borderLeftWidth: 4,
-        borderLeftColor: task.completed ? '#4CAF50' : '#FFD54F'
-      }}
-    >
-      <Text style={{ 
-        color: '#FFFFFF', 
-        textDecorationLine: task.completed ? 'line-through' : 'none',
-        opacity: task.completed ? 0.6 : 1
-      }}>
-        {task.title}
-      </Text>
-      {task.due && (
-        <Text style={{ color: '#B0BEC5', fontSize: 12, marginTop: 4 }}>
-          Due: {new Date(task.due).toLocaleDateString()}
+    <View style={{ 
+      marginBottom: 8, 
+      padding: 16, 
+      backgroundColor: '#1E1E1E', 
+      borderRadius: 16,
+      borderLeftWidth: 4,
+      borderLeftColor: task.completed ? '#4CAF50' : '#FFD54F'
+    }}>
+      <Pressable onPress={handleComplete} style={{ flex: 1 }}>
+        <Text style={{ 
+          color: '#FFFFFF', 
+          textDecorationLine: task.completed ? 'line-through' : 'none',
+          opacity: task.completed ? 0.6 : 1,
+          fontSize: 16
+        }}>
+          {task.title}
         </Text>
-      )}
-      <Text style={{ color: '#FFD54F', fontSize: 12, marginTop: 4 }}>
-        +{task.xpWeight} XP
-      </Text>
-    </Pressable>
+        {task.due && (
+          <Text style={{ color: '#B0BEC5', fontSize: 12, marginTop: 4 }}>
+            Due: {new Date(task.due).toLocaleDateString()}
+          </Text>
+        )}
+        <Text style={{ color: '#FFD54F', fontSize: 12, marginTop: 4 }}>
+          +{task.xpWeight} XP
+        </Text>
+      </Pressable>
+      
+      <Pressable 
+        onPress={handleDelete}
+        style={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          backgroundColor: '#FF5252',
+          borderRadius: 12,
+          width: 24,
+          height: 24,
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' }}>×</Text>
+      </Pressable>
+    </View>
   );
 } 

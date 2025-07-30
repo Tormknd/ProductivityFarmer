@@ -29,6 +29,18 @@ export const useUpdateTask = () => {
   });
 };
 
+export const useCompleteTask = () => {
+  const api = useApi();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.put(`/tasks/${id}/complete`).then(r => r.data as Task),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["tasks"] });
+      qc.invalidateQueries({ queryKey: ["user"] }); // Refresh user XP
+    }
+  });
+};
+
 export const useDeleteTask = () => {
   const api = useApi();
   const qc = useQueryClient();

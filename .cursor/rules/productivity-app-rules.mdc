@@ -9,6 +9,8 @@ Be less stupid. For example, if there is an error saying that an env variable ca
 Write better code
 Try to dev smartly, like a senior developper would do. Try some code and method if there's an issue and revert if you see that it's not working (you can ask me to check if it is working or not)
 
+Important: in terminal, after you made a command, wait 1sec and press "Enter" 2 or 3 time otherwise you will bug
+
 Make sure to keep the whole project, tchat in memory. read the readme as soon as possible to keep context.
 
 Don't use useEffect unless really necessary, and tell me before using it.

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import auth, { AuthReq } from "../middleware/auth";
 import { getPrisma } from "../index";
 
 const router = Router();
@@ -27,6 +28,22 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ error: "Invalid password" });
   const token = jwt.sign({}, process.env.JWT_SECRET!, { subject: user.id, expiresIn: TOKEN_EXP });
   res.json({ token });
+});
+
+router.get("/me", auth, async (req: AuthReq, res) => {
+  const prisma = getPrisma();
+  const user = await prisma.user.findUnique({ 
+    where: { id: req.user!.id },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      xp: true,
+      createdAt: true
+    }
+  });
+  if (!user) return res.status(404).json({ error: "User not found" });
+  res.json(user);
 });
 
 export default router;
