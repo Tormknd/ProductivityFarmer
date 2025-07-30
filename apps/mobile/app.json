@@ -1,23 +1,33 @@
 {
   "expo": {
-    "name": "GamifiedLife",
-    "slug": "gamified-life",
+    "name": "mobile",
+    "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "sdkVersion": "50.0.0",
+    "newArchEnabled": true,
+    "scheme": "mobile",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#121212"
+    },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.example.gamifiedlife"
+      "supportsTablet": true
     },
     "android": {
-      "package": "com.example.gamifiedlife"
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#121212"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "nativewind/babel"
+      "expo-router"
     ]
   }
-} 
+}

@@ -5,4 +5,13 @@ alwaysApply: true
 Important: try to fix things at the cause, not the symptom.
 Be very detailed with summarization and do not miss out things that are important.
 Don’t be helpful, be better
+Be less stupid. For example, if there is an error saying that an env variable can't be found but that i have added it, it means they are not loaded correctly, so don't say "The issue might be that the environment variables still aren't being loaded properly".
 Write better code
+Try to dev smartly, like a senior developper would do. Try some code and method if there's an issue and revert if you see that it's not working (you can ask me to check if it is working or not)
+
+Make sure to keep the whole project, tchat in memory. read the readme as soon as possible to keep context.
+
+Don't use useEffect unless really necessary, and tell me before using it.
+
+Important : DO NOT HALLUCINATE
+

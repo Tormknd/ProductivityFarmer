@@ -1,12 +1,11 @@
 {
-  "name": "gamified-life-api",
+  "name": "api",
   "version": "0.1.0",
-  "type": "module",
   "scripts": {
-    "dev": "nodemon --watch src --exec \"node --loader ts-node/esm src/index.ts\"",
+    "dev": "cross-env DATABASE_URL=file:./prisma/dev.db JWT_SECRET=your-super-secret-jwt-key-change-this-in-production OPENAI_API_KEY=your-openai-api-key-here PORT=4000 nodemon --watch src --exec \"ts-node src/index.ts\"",
     "build": "tsc",
     "start": "node dist/index.js",
-    "seed": "node --loader ts-node/esm prisma/seed.ts"
+    "seed": "cross-env DATABASE_URL=file:./prisma/dev.db JWT_SECRET=your-super-secret-jwt-key-change-this-in-production OPENAI_API_KEY=your-openai-api-key-here PORT=4000 ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
@@ -23,6 +22,8 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.0.0",
+    "cross-env": "^10.0.0",
+    "dotenv-cli": "^10.0.0",
     "nodemon": "^3.1.0",
     "prisma": "^5.0.0",
     "ts-node": "^10.9.2",

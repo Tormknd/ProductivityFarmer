@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "GamifiedLife",
+    "slug": "gamified-life",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "sdkVersion": "50.0.0",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.gamifiedlife"
+    },
+    "android": {
+      "package": "com.example.gamifiedlife"
+    },
+    "plugins": [
+      "nativewind/babel"
+    ]
+  }
+} 

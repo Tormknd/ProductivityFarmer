@@ -23,7 +23,7 @@ A comprehensive productivity app built with a monorepo architecture featuring an
 
 ## 🏗️ Project Structure
 
-This project follows a monorepo pattern with shared packages and separate applications for backend and frontend.
+This project follows a **pnpm monorepo** pattern with shared packages and separate applications for backend and frontend. The workspace is managed by `pnpm-workspace.yaml` and includes shared dependencies and scripts.
 
 ```
 ProductivityLeveling/
@@ -109,6 +109,20 @@ ProductivityLeveling/
 
 ---
 
+## 📦 Monorepo Benefits
+
+- **Shared Dependencies**: Common packages and types across apps
+- **Unified Development**: Single command to start all services
+- **Consistent Tooling**: Same linting, testing, and build processes
+- **Efficient Development**: Hot reload for both API and mobile simultaneously
+
+### Workspace Management
+- `pnpm install` - Install all dependencies across all packages
+- `pnpm dev` - Start both API and mobile in development mode
+- `pnpm --filter <package> <command>` - Run commands in specific packages
+
+---
+
 ## 🛠️ Tech Stack
 
 | Layer      | Tools / Libraries                                                                                                    |
@@ -116,7 +130,7 @@ ProductivityLeveling/
 | **Mobile** | Expo SDK 50 · React Native 0.74 · Expo Router v3 · React Query v5 · NativeWind · Expo Camera & Barcode Scanner        |
 |            | Reanimated v3 · Expo Notifications · **Secure Store** for JWT                                                         |
 | **Backend**| Node 18 · Express 4 · Prisma 5 · SQLite (dev) / Postgres (prod) · JWT auth · OpenAI SDK (o3)                          |
-| **Infra**  | Docker · docker-compose · pnpm / npm · EAS Build (iOS / Android)                                                      |
+| **Infra**  | Docker · docker-compose · **pnpm monorepo** · EAS Build (iOS / Android)                                                |
 
 ---
 
@@ -125,7 +139,7 @@ ProductivityLeveling/
 | Tool | Version | Install |
 |------|---------|---------|
 | Node.js | ≥ 18 LTS | <https://nodejs.org> |
-| pnpm (optional) | ≥ 8 | `npm i -g pnpm` |
+| pnpm | ≥ 8 | `npm i -g pnpm` |
 | Expo CLI | ≥ 7 | `npm i -g expo-cli` |
 | Docker | ≥ 24 | <https://docs.docker.com/get-docker/> |
 
@@ -139,24 +153,28 @@ ProductivityLeveling/
 git clone https://github.com/your-org/productivity-leveling.git
 cd productivity-leveling
 
-# ① BACKEND
+# Install all dependencies (pnpm monorepo)
+pnpm install
+
+# ① BACKEND SETUP
 cd apps/api
-cp .env.example .env          # set JWT_SECRET & OPENAI_API_KEY
-npm install                   # or pnpm install
-npx prisma db push            # create SQLite
-npm run seed                  # demo foods
-npm run dev                   # → http://localhost:4000
+
+# Initialize database
+pnpm prisma db push
+pnpm run seed                  # demo foods
+pnpm run dev                   # → http://localhost:4000
 # leave this terminal running
 
 # ② MOBILE (new terminal)
 cd ../mobile
-npm install                   # or pnpm install
-npm start                     # press i / a / w for iOS / Android / Web
+pnpm start                     # press i / a / w for iOS / Android / Web
 ```
 
 ---
 
 ## 🔧 Environment Variables
+
+**Important:** The API uses `cross-env` to ensure environment variables are properly loaded across different platforms. The environment variables are set directly in the `package.json` scripts.
 
 | Variable              | Scope   | Example                 | Notes             |
 | --------------------- | ------- | ----------------------- | ----------------- |
@@ -166,18 +184,38 @@ npm start                     # press i / a / w for iOS / Android / Web
 | `OPENAI_API_KEY`      | backend | `sk-…`                  |                   |
 | `EXPO_PUBLIC_API_URL` | mobile  | `http://localhost:4000` | injected at build |
 
+### Environment Variable Loading Issue
+
+**Problem:** Environment variables from `.env` files weren't being loaded properly when using `pnpm dev` on Windows.
+
+**Solution:** Using `cross-env` in the package.json scripts to explicitly set environment variables:
+
+```json
+{
+  "scripts": {
+    "dev": "cross-env DATABASE_URL=file:./prisma/dev.db JWT_SECRET=your-secret OPENAI_API_KEY=your-key PORT=4000 nodemon --watch src --exec \"ts-node src/index.ts\""
+  }
+}
+```
+
+This ensures environment variables are available to the Node.js process regardless of the platform or shell being used.
+
 ---
 
 ## 📜 Common Scripts
 
 | Directory | Script                            | Action                        |
 | --------- | --------------------------------- | ----------------------------- |
-| `apps/api` | `npm run dev`                     | Hot-reload API                |
-|           | `npm run build`                   | Compile TS → dist             |
-|           | `npm run seed`                    | Populate base foods           |
-| `apps/mobile`  | `npm start`                       | Expo dev server               |
-|           | `npm run android` / `npm run ios` | Open emulator / simulator     |
-|           | `npm run build`                   | `eas build` cloud compilation |
+| **Root**  | `pnpm install`                    | Install all dependencies       |
+|           | `pnpm dev`                        | Start both API & mobile        |
+|           | `pnpm dev:api`                    | Start API only                |
+|           | `pnpm dev:mobile`                 | Start mobile only              |
+| `apps/api` | `pnpm run dev`                    | Hot-reload API                |
+|           | `pnpm run build`                  | Compile TS → dist             |
+|           | `pnpm run seed`                   | Populate base foods           |
+| `apps/mobile`  | `pnpm start`                      | Expo dev server               |
+|           | `pnpm run android` / `pnpm run ios` | Open emulator / simulator     |
+|           | `pnpm run build`                  | `eas build` cloud compilation |
 
 ---
 
@@ -241,34 +279,113 @@ Shared utilities, types, and API client hooks used across both frontend and back
 - [x] **Authentication Middleware**: JWT token validation
 - [x] **Docker Configuration**: Containerization setup
 - [x] **Database Seeding**: Initial food data population
+- [x] **Environment Variable Loading**: Fixed with cross-env
 
-#### Mobile App
-- [x] **Navigation Structure**: Expo Router v3 with tab navigation
-- [x] **Authentication Screens**: Login and registration forms
-- [x] **Dashboard**: XP progress display and overview
-- [x] **Task Management**: Task list with completion functionality
-- [x] **Nutrition Tracking**: Barcode scanner integration
-- [x] **Chat Interface**: Message display and input system
-- [x] **Settings**: User preferences and logout
-- [x] **API Integration**: React Query hooks for all endpoints
-- [x] **UI Components**: Reusable components with dark theme
-- [x] **Push Notifications**: Task reminder system
-- [x] **State Management**: Context-based authentication state
+#### Mobile App - Core Infrastructure
+- [x] **Navigation Structure**: Expo Router v3 with tab navigation (FIXED ✅)
+- [x] **Authentication Flow**: Login/register with JWT token management
+- [x] **Authentication Context**: React Context for state management
+- [x] **Secure Token Storage**: Expo SecureStore for JWT persistence
+- [x] **API Client Setup**: Axios instance with auth headers
+- [x] **Environment Configuration**: app.config.ts for API URL injection
+- [x] **Basic UI Components**: Dark theme with consistent styling
+- [x] **Tab Navigation**: Working navigation between screens
 
-### 🔄 **In Progress**
-- [ ] **AI Chat Integration**: OpenAI API implementation in chat
-- [ ] **Type Definitions**: Complete TypeScript interfaces
-- [ ] **Error Handling**: Comprehensive error management
-- [ ] **Testing**: Unit and integration tests
+#### Mobile App - Screens (Basic UI Only)
+- [x] **Dashboard**: Welcome screen with user info display
+- [x] **Tasks**: Placeholder screen with "coming soon" message
+- [x] **Nutrition**: Placeholder screen with barcode scanner button
+- [x] **Chat**: Placeholder screen with input field (no API integration)
+- [x] **Settings**: Logout functionality working
 
-### 📋 **Planned Features**
-- [ ] **Social Features**: Leaderboards and friend system
-- [ ] **Advanced Analytics**: Detailed progress reporting
-- [ ] **Health App Integration**: Apple Health/Google Fit sync
-- [ ] **Offline Support**: Local data caching
-- [ ] **Multi-language Support**: Internationalization
-- [ ] **Advanced Notifications**: Smart reminder scheduling
-- [ ] **Gamification**: Achievements and badges system
+### 🔄 **Partially Implemented (From mobile-old-working)**
+
+#### Components (Available but not integrated)
+- [ ] **TaskItem**: Individual task display component
+- [ ] **MealCard**: Meal information card component
+- [ ] **XPBar**: Experience progress bar component
+- [ ] **ChatBubble**: Chat message component
+- [ ] **BarcodeScanner**: Camera-based barcode scanner component
+
+#### API Integration (Hooks available but not used)
+- [ ] **useTasks**: React Query hook for task management
+- [ ] **useAddTask**: Mutation hook for creating tasks
+- [ ] **useMeals**: Hook for meal tracking
+- [ ] **useFoods**: Hook for food database
+- [ ] **useXP**: Hook for experience points
+- [ ] **useChat**: Hook for AI chat functionality
+
+#### Type Definitions (Available but not used)
+- [ ] **Task Interface**: Complete task type definitions
+- [ ] **Food Interface**: Food and nutrition types
+- [ ] **Meal Interface**: Meal tracking types
+- [ ] **User Interface**: User profile types
+- [ ] **XP Interface**: Experience system types
+- [ ] **Chat Interface**: Chat message types
+
+### ❌ **Missing/Not Implemented**
+
+#### Core Functionality
+- [ ] **Real API Integration**: Currently using placeholder screens
+- [ ] **Task Management**: No actual task CRUD operations
+- [ ] **Nutrition Tracking**: No barcode scanning or food logging
+- [ ] **AI Chat**: No OpenAI integration or message handling
+- [ ] **XP System**: No experience points calculation or display
+- [ ] **Push Notifications**: No notification system
+- [ ] **Error Handling**: No comprehensive error management
+- [ ] **Loading States**: No loading indicators or skeleton screens
+
+#### Advanced Features
+- [ ] **Offline Support**: No local data caching
+- [ ] **Data Validation**: No input validation or error messages
+- [ ] **Testing**: No unit or integration tests
+- [ ] **Performance Optimization**: No lazy loading or optimization
+- [ ] **Accessibility**: No WCAG compliance features
+
+### 📋 **Immediate Next Steps (Priority Order)**
+
+1. **🔧 Fix Navigation Issues** ✅ **COMPLETED**
+   - Fixed missing `index.tsx` file in `(tabs)` directory
+   - Authentication flow now works correctly
+   - Login/logout navigation functioning
+
+2. **🔌 Connect Real API Integration**
+   - Replace placeholder screens with actual API calls
+   - Integrate React Query hooks from `mobile-old-working`
+   - Add proper error handling and loading states
+
+3. **📱 Implement Task Management**
+   - Integrate `TaskItem` component
+   - Connect `useTasks` and `useAddTask` hooks
+   - Add task creation, completion, and deletion
+
+4. **🍎 Add Nutrition Tracking**
+   - Integrate `BarcodeScanner` component
+   - Connect `useFoods` and `useMeals` hooks
+   - Implement food logging functionality
+
+5. **🤖 Enable AI Chat**
+   - Integrate `ChatBubble` component
+   - Connect `useChat` hook
+   - Implement OpenAI API integration
+
+6. **⭐ Add XP System**
+   - Integrate `XPBar` component
+   - Connect `useXP` hook
+   - Display user progress and levels
+
+### 📊 **Progress Summary**
+
+| Feature Category | Status | Progress |
+|-----------------|--------|----------|
+| **Navigation & Auth** | ✅ Complete | 100% |
+| **Backend API** | ✅ Complete | 100% |
+| **UI Components** | 🔄 Available | 80% |
+| **API Integration** | ❌ Missing | 0% |
+| **Core Functionality** | ❌ Missing | 0% |
+| **Advanced Features** | ❌ Missing | 0% |
+
+**Overall Project Progress: ~35%**
 
 ---
 
@@ -314,25 +431,36 @@ docker run -d -p 4000:4000 \
 
 ## 🔧 Known Issues & Next Steps
 
+### **✅ Recently Fixed**
+1. **Navigation Issues**: Fixed "unmatched route" error by creating missing `index.tsx` file
+2. **Authentication Flow**: Login/logout navigation now works correctly
+3. **Environment Configuration**: Mobile app properly configured with API URL injection
+4. **Environment Variable Loading**: Fixed with cross-env in package.json scripts
+
 ### **Current Issues**
-1. **TypeScript Configuration**: Some type definition files need proper configuration
-2. **Dependencies**: Missing type definitions for some packages
-3. **Environment Variables**: Need proper .env.example file setup
-4. **API Base URL**: Mobile app needs proper API URL configuration
+1. **Placeholder Screens**: All main screens (Tasks, Nutrition, Chat) are placeholders
+2. **No Real API Integration**: Mobile app not connected to backend API
+3. **Missing Components**: UI components from `mobile-old-working` not integrated
+4. **No Functionality**: Core features (task management, nutrition tracking, chat) not implemented
 
 ### **Immediate Next Steps**
-1. **Fix TypeScript Errors**: Resolve remaining type issues
-2. **Complete AI Integration**: Implement OpenAI chat functionality
-3. **Add Error Boundaries**: Implement proper error handling
-4. **Testing Setup**: Add Jest and React Native Testing Library
-5. **Documentation**: Add API documentation and usage examples
+1. **🔌 Connect API Integration**: Replace placeholder screens with real API calls
+2. **📱 Implement Task Management**: Integrate TaskItem component and useTasks hook
+3. **🍎 Add Nutrition Tracking**: Integrate BarcodeScanner and food logging
+4. **🤖 Enable AI Chat**: Connect OpenAI integration and ChatBubble component
+5. **⭐ Add XP System**: Display user progress with XPBar component
+
+### **Development Approach**
+- **Copy from mobile-old-working**: Most components and API hooks are already implemented
+- **Gradual Integration**: Add features one by one, testing each step
+- **Maintain Navigation**: Keep the working navigation structure intact
 
 ---
 
 ## 🤝 Contributing
 
 1. Fork → feature branch → PR.
-2. Run `npm run lint` and `npm test` (CI enforces).
+2. Run `pnpm lint` and `pnpm test` (CI enforces).
 3. Squash-merge with a clear commit message.
 
 ---

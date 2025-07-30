@@ -1,19 +1,22 @@
 {
   "name": "gamified-life-monorepo",
   "private": true,
-  "packageManager": "pnpm@8",
   "workspaces": [
     "apps/api",
     "apps/mobile"
   ],
   "scripts": {
-    "dev": "pnpm --filter gamified-life-api... --filter gamified-life-mobile... --parallel run dev",
-    "dev:api": "pnpm --filter gamified-life-api dev",
-    "dev:mobile": "pnpm --filter gamified-life-mobile start",
-    "build:api": "pnpm --filter gamified-life-api build",
-    "build:mobile": "pnpm --filter gamified-life-mobile build",
+    "dev": "pnpm --filter api... --filter mobile... --parallel run dev",
+    "dev:api": "pnpm --filter api dev",
+    "dev:mobile": "pnpm --filter mobile start",
+    "start:mobile": "pnpm --filter mobile start",
+    "android": "pnpm --filter mobile android",
+    "ios": "pnpm --filter mobile ios",
+    "web": "pnpm --filter mobile web",
+    "build:api": "pnpm --filter api build",
+    "build:mobile": "pnpm --filter mobile build",
     "install:all": "pnpm install",
-    "clean": "pnpm -r exec rm -rf node_modules && rm -rf node_modules"
+    "clean": "if exist node_modules rmdir /s /q node_modules && if exist apps\\api\\node_modules rmdir /s /q apps\\api\\node_modules && if exist apps\\mobile\\node_modules rmdir /s /q apps\\mobile\\node_modules"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
