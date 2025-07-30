@@ -41,6 +41,18 @@ export default function Tasks() {
 
 
 
+  // Animate progress bar when importance changes (JS driver only)
+  useEffect(() => {
+    const xpValue = getImportanceXP(newTask.importance);
+    const targetProgress = (xpValue / 50) * 100;
+    
+    Animated.timing(progressWidth, {
+      toValue: targetProgress,
+      duration: 600,
+      useNativeDriver: false,
+    }).start();
+  }, [newTask.importance]);
+
   // Animate container scale when importance changes (native driver only)
   useEffect(() => {
     Animated.sequence([
@@ -318,6 +330,65 @@ export default function Tasks() {
                       {getImportanceLabel(newTask.importance)}
                     </Text>
                   </View>
+                </View>
+                
+                {/* Animated Progress Bar */}
+                <View style={{ 
+                  height: 12, 
+                  backgroundColor: '#2A2A2A', 
+                  borderRadius: 6, 
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}>
+                  {/* Background gradient */}
+                  <View style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    borderRadius: 6,
+                    backgroundColor: '#1A1A1A',
+                  }} />
+                  
+                  {/* Animated progress */}
+                  <Animated.View 
+                    style={{ 
+                      width: progressWidth.interpolate({
+                        inputRange: [0, 100],
+                        outputRange: ['0%', '100%'],
+                      }),
+                      height: '100%', 
+                      backgroundColor: getImportanceColor(newTask.importance),
+                      borderRadius: 6,
+                      shadowColor: getImportanceColor(newTask.importance),
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.5,
+                      shadowRadius: 4,
+                      elevation: 4,
+                    }} 
+                  />
+                </View>
+                
+                {/* XP Level indicators */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+                  {[5, 15, 25, 40, 50].map((level) => (
+                    <View key={level} style={{ alignItems: 'center' }}>
+                      <View style={{
+                        width: 4,
+                        height: 4,
+                        borderRadius: 2,
+                        backgroundColor: getImportanceXP(newTask.importance) >= level ? getImportanceColor(newTask.importance) : '#2A2A2A',
+                      }} />
+                      <Text style={{ 
+                        color: getImportanceXP(newTask.importance) >= level ? getImportanceColor(newTask.importance) : '#666', 
+                        fontSize: 8, 
+                        marginTop: 2 
+                      }}>
+                        {level}
+                      </Text>
+                    </View>
+                  ))}
                 </View>
               </Animated.View>
 
