@@ -71,10 +71,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const loginWithMockUser = async () => {
-    console.log("Logging in with mock user via API...");
     try {
       // Clear any existing token first
-      console.log("Clearing existing token...");
       setToken(null);
       setUser(null);
       await SecureStore.deleteItemAsync("token");
@@ -90,43 +88,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           password: "test123",
           name: "Test User"
         });
-        console.log("Mock user registered successfully");
       } catch (error: any) {
         // User might already exist, that's okay
-        console.log("User might already exist:", error.response?.data?.error);
       }
       
       // Now login to get a real token
-      console.log("Logging in to get real token...");
       const { data } = await api.post("/auth/login", {
         email: "test@example.com",
         password: "test123"
       });
       
-      console.log("Mock user logged in successfully, token received");
-      console.log("New token:", data.token);
       setToken(data.token);
       setUser(MOCK_USER);
       await SecureStore.setItemAsync("token", data.token);
     } catch (error: any) {
-      console.error("Error logging in mock user:", error.response?.data || error.message);
       throw error;
     }
   };
 
-  // Auto-navigate when token is set
-  useEffect(() => {
-    if (token && user) {
-      console.log("Token and user set, should navigate to tabs");
-    }
-  }, [token, user]);
-
   const logout = async () => {
-    console.log("Logging out...");
     setToken(null);
     setUser(null);
     await SecureStore.deleteItemAsync("token");
-    console.log("Logout complete");
   };
 
   return (

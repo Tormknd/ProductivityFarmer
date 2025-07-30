@@ -15,7 +15,6 @@ export default function Settings() {
           text: 'Logout', 
           onPress: async () => {
             await logout();
-            console.log("Navigating to login after logout");
             router.replace("/auth/login");
           }, 
           style: 'destructive' 

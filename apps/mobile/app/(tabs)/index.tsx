@@ -4,6 +4,7 @@ import { useUser } from '../../src/api/xp';
 import { useTasks } from '../../src/api/tasks';
 import { calcLevel } from '../../src/lib/xp';
 import XPBar from '../../src/components/XPBar';
+import MMORPGIcon, { ICON_NAMES } from '../../src/components/MMORPGIcons';
 
 export default function Dashboard() {
   const { user: authUser, token } = useAuth();
@@ -18,25 +19,17 @@ export default function Dashboard() {
   const currentUser = user || authUser;
   const { level, nextLevelXp } = currentUser ? calcLevel(currentUser.xp || 0) : { level: 0, nextLevelXp: 100 };
 
-  console.log('Dashboard Debug:', {
-    authUser: !!authUser,
-    user: user,
-    userLoading,
-    userError,
-    tasks: tasks?.length,
-    tasksLoading,
-    tasksError,
-    level,
-    nextLevelXp,
-    token: !!token
-  });
+
 
   return (
     <View style={{ flex: 1, backgroundColor: '#121212' }}>
       <ScrollView style={{ padding: 20 }}>
-        <Text style={{ color: '#FFD54F', fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>
-          Dashboard
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+          <MMORPGIcon name={ICON_NAMES.HOME} size={28} color="#FFD54F" style={{ marginRight: 12 }} />
+          <Text style={{ color: '#FFD54F', fontSize: 24, fontWeight: 'bold' }}>
+            Dashboard
+          </Text>
+        </View>
         
         {token ? (
           <>
@@ -47,29 +40,14 @@ export default function Dashboard() {
               borderRadius: 16, 
               marginBottom: 20 
             }}>
-              <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' }}>
-                Welcome back, {currentUser?.name || 'User'}! 👋
-              </Text>
-              
-              {/* Force show debug info */}
-              <Text style={{ color: '#FF5252', fontSize: 14, marginTop: 8 }}>
-                DEBUG: Token={!!token}, AuthUser={!!authUser}, APIUser={!!user}
-              </Text>
-              <Text style={{ color: '#FF5252', fontSize: 14, marginTop: 4 }}>
-                UserLoading={userLoading}, TasksLoading={tasksLoading}
-              </Text>
-              {userError && (
-                <Text style={{ color: '#FF5252', fontSize: 14, marginTop: 4 }}>
-                  User Error: {userError.message}
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <MMORPGIcon name={ICON_NAMES.CROWN} size={20} color="#FFD54F" style={{ marginRight: 8 }} />
+                <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' }}>
+                  Welcome back, {currentUser?.name || 'User'}!
                 </Text>
-              )}
-              {tasksError && (
-                <Text style={{ color: '#FF5252', fontSize: 14, marginTop: 4 }}>
-                  Tasks Error: {tasksError.message}
-                </Text>
-              )}
+              </View>
               
-              {/* Force show user data */}
+
               <Text style={{ color: '#FFD54F', fontSize: 16, marginTop: 8 }}>
                 Level {level + 1} • {currentUser?.xp || 0} XP
               </Text>
@@ -79,7 +57,7 @@ export default function Dashboard() {
               </Text>
             </View>
 
-            {/* Stats - Force show */}
+            {/* Stats */}
             <View style={{ 
               backgroundColor: '#1E1E1E', 
               padding: 20, 
@@ -111,7 +89,7 @@ export default function Dashboard() {
               </View>
             </View>
 
-            {/* Recent Tasks - Force show */}
+            {/* Recent Tasks */}
             <View style={{ 
               backgroundColor: '#1E1E1E', 
               padding: 20, 

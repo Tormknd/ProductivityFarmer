@@ -52,7 +52,7 @@ app.use("/foods", foodsRouter);
 app.use("/xp", xpRouter);
 app.use("/chat", chatRouter);
 
-const port = process.env.PORT || 4000;
+const port = parseInt(process.env.PORT || '4000', 10);
 app.listen(port, "0.0.0.0", () => {
   console.log(`🚀 API server running on port ${port}`);
   console.log(`📍 Local: http://localhost:${port}`);

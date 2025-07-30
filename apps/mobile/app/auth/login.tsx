@@ -33,17 +33,11 @@ export default function Login() {
   };
 
   const quickLogin = async () => {
-    console.log("Quick login started");
     await loginWithMockUser();
-    console.log("Mock user logged in, state updated");
-    
-    // Navigate directly to tabs
-    console.log("Navigating to tabs...");
     router.replace("/(tabs)");
   };
 
   const clearToken = async () => {
-    console.log("Clearing stored token...");
     await logout();
     Alert.alert("Token Cleared", "Stored token has been cleared. Try quick login again.");
   };
