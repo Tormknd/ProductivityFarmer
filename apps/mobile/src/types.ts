@@ -4,6 +4,7 @@ export interface Task {
   due?: Date;
   completed: boolean;
   xpWeight: number;
+  importance?: string;
   userId: string;
   createdAt: Date;
 }

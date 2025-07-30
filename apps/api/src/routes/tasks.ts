@@ -5,6 +5,24 @@ import { getPrisma } from "../index";
 const router = Router();
 router.use(auth);
 
+// Calculate XP based on importance level
+function getXPFromImportance(importance: string): number {
+  switch (importance) {
+    case "Low":
+      return 5;
+    case "Medium":
+      return 10;
+    case "High":
+      return 15;
+    case "Critical":
+      return 25;
+    case "Epic":
+      return 40;
+    default:
+      return 10; // Default to Medium
+  }
+}
+
 router.get("/", async (req: AuthReq, res) => {
   console.log("Tasks GET - User ID:", req.user?.id);
   const prisma = getPrisma();
@@ -16,10 +34,20 @@ router.get("/", async (req: AuthReq, res) => {
 router.post("/", async (req: AuthReq, res) => {
   console.log("Tasks POST - User ID:", req.user?.id);
   console.log("Tasks POST - Body:", req.body);
-  const { title, due, xpWeight } = req.body;
+  const { title, due, importance } = req.body;
+  
+  // Calculate XP based on importance
+  const xpWeight = getXPFromImportance(importance || "Medium");
+  
   const prisma = getPrisma();
   const task = await prisma.task.create({
-    data: { title, due: due ? new Date(due) : undefined, xpWeight, userId: req.user!.id }
+    data: { 
+      title, 
+      due: due ? new Date(due) : undefined, 
+      xpWeight,
+      importance: importance || "Medium",
+      userId: req.user!.id 
+    }
   });
   console.log("Tasks POST - Created task:", task.id);
   res.status(201).json(task);
@@ -30,7 +58,7 @@ router.put("/:id", async (req: AuthReq, res) => {
   console.log("Tasks PUT - Task ID:", req.params.id);
   console.log("Tasks PUT - Body:", req.body);
   const { id } = req.params;
-  const { title, due, xpWeight, completed } = req.body;
+  const { title, due, importance, completed } = req.body;
   const prisma = getPrisma();
   
   // Verify task belongs to user
@@ -42,12 +70,16 @@ router.put("/:id", async (req: AuthReq, res) => {
     return res.status(404).json({ message: "Task not found" });
   }
   
+  // Calculate XP based on importance
+  const xpWeight = getXPFromImportance(importance || existingTask.importance || "Medium");
+  
   const task = await prisma.task.update({
     where: { id },
     data: { 
       title, 
       due: due ? new Date(due) : undefined, 
-      xpWeight, 
+      xpWeight,
+      importance: importance || existingTask.importance,
       completed 
     }
   });

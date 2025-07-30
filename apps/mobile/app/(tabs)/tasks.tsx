@@ -12,7 +12,7 @@ export default function Tasks() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newTask, setNewTask] = useState({
     title: '',
-    xpWeight: 10,
+    importance: 'Medium' as string,
     due: undefined as Date | undefined
   });
   const [isAdding, setIsAdding] = useState(false);
@@ -41,18 +41,7 @@ export default function Tasks() {
 
 
 
-  // Animate progress bar when XP changes (JS driver only)
-  useEffect(() => {
-    const targetProgress = (newTask.xpWeight / 50) * 100;
-    
-    Animated.timing(progressWidth, {
-      toValue: targetProgress,
-      duration: 600,
-      useNativeDriver: false,
-    }).start();
-  }, [newTask.xpWeight]);
-
-  // Animate container scale when XP changes (native driver only)
+  // Animate container scale when importance changes (native driver only)
   useEffect(() => {
     Animated.sequence([
       Animated.timing(containerScale, {
@@ -66,7 +55,7 @@ export default function Tasks() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [newTask.xpWeight]);
+  }, [newTask.importance]);
 
   const handleAddTask = async () => {
     if (!newTask.title.trim()) {
@@ -78,11 +67,11 @@ export default function Tasks() {
     try {
       await addTask.mutateAsync({
         title: newTask.title.trim(),
-        xpWeight: newTask.xpWeight,
+        importance: newTask.importance,
         due: newTask.due,
         completed: false
       });
-      setNewTask({ title: '', xpWeight: 10, due: undefined });
+      setNewTask({ title: '', importance: 'Medium', due: undefined });
       setIsModalVisible(false);
     } catch (error: any) {
       Alert.alert('Error', error.response?.data?.message || 'Failed to add task');
@@ -92,7 +81,7 @@ export default function Tasks() {
   };
 
   const resetForm = () => {
-    setNewTask({ title: '', xpWeight: 10, due: undefined });
+    setNewTask({ title: '', importance: 'Medium', due: undefined });
     setIsModalVisible(false);
   };
 
@@ -100,39 +89,51 @@ export default function Tasks() {
     setNewTask({ ...newTask, due: undefined });
   };
 
-  const getXPLabel = (xp: number) => {
-    if (xp <= 5) return 'Easy';
-    if (xp <= 15) return 'Normal';
-    if (xp <= 25) return 'Hard';
-    if (xp <= 40) return 'Very Hard';
-    return 'Epic';
+  const getImportanceLabel = (importance: string) => {
+    switch (importance) {
+      case 'Low': return 'Low';
+      case 'Medium': return 'Medium';
+      case 'High': return 'High';
+      case 'Critical': return 'Critical';
+      case 'Epic': return 'Epic';
+      default: return 'Medium';
+    }
   };
 
-  const getXPColor = (xp: number) => {
-    if (xp <= 5) return '#4CAF50';
-    if (xp <= 15) return '#FFD54F';
-    if (xp <= 25) return '#FF9800';
-    if (xp <= 40) return '#F44336';
-    return '#9C27B0';
+  const getImportanceColor = (importance: string) => {
+    switch (importance) {
+      case 'Low': return '#4CAF50';
+      case 'Medium': return '#FFD54F';
+      case 'High': return '#FF9800';
+      case 'Critical': return '#F44336';
+      case 'Epic': return '#9C27B0';
+      default: return '#FFD54F';
+    }
   };
 
-  const getXPIcon = (xp: number) => {
-    if (xp <= 5) return '🌱';
-    if (xp <= 15) return '⚡';
-    if (xp <= 25) return '🔥';
-    if (xp <= 40) return '💎';
-    return '👑';
+  const getImportanceIcon = (importance: string) => {
+    switch (importance) {
+      case 'Low': return ICON_NAMES.EASY;
+      case 'Medium': return ICON_NAMES.MEDIUM;
+      case 'High': return ICON_NAMES.HARD;
+      case 'Critical': return ICON_NAMES.EPIC;
+      case 'Epic': return ICON_NAMES.LEGENDARY;
+      default: return ICON_NAMES.MEDIUM;
+    }
   };
 
-  const getXPSound = (xp: number) => {
-    if (xp <= 5) return 'Ping!';
-    if (xp <= 15) return 'Zap!';
-    if (xp <= 25) return 'Boom!';
-    if (xp <= 40) return 'Crystal!';
-    return 'LEGENDARY!';
+  const getImportanceXP = (importance: string) => {
+    switch (importance) {
+      case 'Low': return 5;
+      case 'Medium': return 10;
+      case 'High': return 15;
+      case 'Critical': return 25;
+      case 'Epic': return 40;
+      default: return 10;
+    }
   };
 
-  const handleXPChange = (newXP: number) => {
+  const handleImportanceChange = (newImportance: string) => {
     // Animate button press
     Animated.sequence([
       Animated.timing(buttonScale, {
@@ -147,7 +148,7 @@ export default function Tasks() {
       }),
     ]).start();
 
-    setNewTask({ ...newTask, xpWeight: newXP });
+    setNewTask({ ...newTask, importance: newImportance });
   };
 
   if (isLoading) {
@@ -263,26 +264,26 @@ export default function Tasks() {
               />
             </View>
 
-            {/* XP Weight - Animated */}
+            {/* Task Importance - Animated */}
             <View style={{ marginBottom: 24 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                 <MMORPGIcon name={ICON_NAMES.SWORD} size={20} color="#FFD54F" style={{ marginRight: 8 }} />
                 <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' }}>
-                  Task Difficulty
+                  Task Importance
                 </Text>
               </View>
               
-              {/* XP Display - Animated */}
+              {/* Importance Display - Animated */}
               <Animated.View 
                 style={{ 
                   backgroundColor: '#1E1E1E', 
                   padding: 16, 
                   borderRadius: 16, 
                   borderWidth: 2, 
-                  borderColor: getXPColor(newTask.xpWeight),
+                  borderColor: getImportanceColor(newTask.importance),
                   marginBottom: 12,
                   transform: [{ scale: containerScale }],
-                  shadowColor: getXPColor(newTask.xpWeight),
+                  shadowColor: getImportanceColor(newTask.importance),
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.3,
                   shadowRadius: 8,
@@ -291,136 +292,76 @@ export default function Tasks() {
               >
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <MMORPGIcon name={ICON_NAMES.XP} size={24} color={getXPColor(newTask.xpWeight)} style={{ marginRight: 8 }} />
+                    <MMORPGIcon name={getImportanceIcon(newTask.importance)} size={24} color={getImportanceColor(newTask.importance)} style={{ marginRight: 8 }} />
                     <View>
                       <Text style={{ color: '#FFFFFF', fontSize: 20, fontWeight: 'bold' }}>
-                        {newTask.xpWeight} XP
+                        {getImportanceXP(newTask.importance)} XP
                       </Text>
                       <Text style={{ color: '#B0BEC5', fontSize: 12 }}>
-                        {getXPSound(newTask.xpWeight)}
+                        {getImportanceLabel(newTask.importance)} Priority
                       </Text>
                     </View>
                   </View>
                   <View style={{
-                    backgroundColor: getXPColor(newTask.xpWeight) + '20',
+                    backgroundColor: getImportanceColor(newTask.importance) + '20',
                     paddingHorizontal: 12,
                     paddingVertical: 6,
                     borderRadius: 20,
                     borderWidth: 1,
-                    borderColor: getXPColor(newTask.xpWeight),
+                    borderColor: getImportanceColor(newTask.importance),
                   }}>
                     <Text style={{ 
-                      color: getXPColor(newTask.xpWeight), 
+                      color: getImportanceColor(newTask.importance), 
                       fontSize: 14, 
                       fontWeight: 'bold',
                     }}>
-                      {getXPLabel(newTask.xpWeight)}
+                      {getImportanceLabel(newTask.importance)}
                     </Text>
                   </View>
                 </View>
-                
-                {/* Animated Progress Bar */}
-                <View style={{ 
-                  height: 12, 
-                  backgroundColor: '#2A2A2A', 
-                  borderRadius: 6, 
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}>
-                  {/* Background gradient */}
-                  <View style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    borderRadius: 6,
-                    backgroundColor: '#1A1A1A',
-                  }} />
-                  
-                  {/* Animated progress */}
-                  <Animated.View 
-                    style={{ 
-                      width: progressWidth.interpolate({
-                        inputRange: [0, 100],
-                        outputRange: ['0%', '100%'],
-                      }),
-                      height: '100%', 
-                      backgroundColor: getXPColor(newTask.xpWeight),
-                      borderRadius: 6,
-                      shadowColor: getXPColor(newTask.xpWeight),
-                      shadowOffset: { width: 0, height: 0 },
-                      shadowOpacity: 0.5,
-                      shadowRadius: 4,
-                      elevation: 4,
-                    }} 
-                  />
-                  
-
-                </View>
-                
-                {/* Level indicators */}
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-                  {[5, 15, 25, 40, 50].map((level) => (
-                    <View key={level} style={{ alignItems: 'center' }}>
-                      <View style={{
-                        width: 4,
-                        height: 4,
-                        borderRadius: 2,
-                        backgroundColor: newTask.xpWeight >= level ? getXPColor(newTask.xpWeight) : '#2A2A2A',
-                      }} />
-                      <Text style={{ 
-                        color: newTask.xpWeight >= level ? getXPColor(newTask.xpWeight) : '#666', 
-                        fontSize: 8, 
-                        marginTop: 2 
-                      }}>
-                        {level}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
               </Animated.View>
 
-              {/* Quick XP Buttons - Animated */}
+              {/* Quick Importance Buttons - Animated */}
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                {[5, 10, 15, 25, 40].map((xp) => (
+                {['Low', 'Medium', 'High', 'Critical', 'Epic'].map((importance) => (
                   <Animated.View
-                    key={xp}
+                    key={importance}
                     style={{
                       transform: [{ scale: buttonScale }]
                     }}
                   >
                     <TouchableOpacity
-                      onPress={() => handleXPChange(xp)}
+                      onPress={() => handleImportanceChange(importance)}
                       style={{
-                        backgroundColor: newTask.xpWeight === xp ? getXPColor(xp) : '#2A2A2A',
+                        backgroundColor: newTask.importance === importance ? getImportanceColor(importance) : '#2A2A2A',
                         paddingHorizontal: 12,
                         paddingVertical: 10,
                         borderRadius: 12,
                         minWidth: 50,
                         alignItems: 'center',
                         borderWidth: 2,
-                        borderColor: newTask.xpWeight === xp ? getXPColor(xp) : 'transparent',
-                        shadowColor: newTask.xpWeight === xp ? getXPColor(xp) : 'transparent',
+                        borderColor: newTask.importance === importance ? getImportanceColor(importance) : 'transparent',
+                        shadowColor: newTask.importance === importance ? getImportanceColor(importance) : 'transparent',
                         shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: newTask.xpWeight === xp ? 0.3 : 0,
+                        shadowOpacity: newTask.importance === importance ? 0.3 : 0,
                         shadowRadius: 4,
-                        elevation: newTask.xpWeight === xp ? 4 : 0,
+                        elevation: newTask.importance === importance ? 4 : 0,
                       }}
                     >
-                      <Text style={{ 
-                        color: newTask.xpWeight === xp ? '#FFFFFF' : '#B0BEC5', 
-                        fontSize: 14, 
-                        fontWeight: 'bold' 
-                      }}>
-                        {xp}
-                      </Text>
                       <MMORPGIcon 
-                        name={ICON_NAMES.XP} 
-                        size={12} 
-                        color={newTask.xpWeight === xp ? '#FFFFFF' : '#666'} 
-                        style={{ marginTop: 2 }} 
+                        name={getImportanceIcon(importance)} 
+                        size={16} 
+                        color={newTask.importance === importance ? '#FFFFFF' : '#666'} 
+                        style={{ marginBottom: 2 }} 
                       />
+                      <Text style={{ 
+                        color: newTask.importance === importance ? '#FFFFFF' : '#B0BEC5', 
+                        fontSize: 10, 
+                        fontWeight: 'bold',
+                        textAlign: 'center'
+                      }}>
+                        {importance}
+                      </Text>
                     </TouchableOpacity>
                   </Animated.View>
                 ))}

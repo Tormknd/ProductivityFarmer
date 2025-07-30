@@ -10,13 +10,14 @@ A comprehensive productivity application with a pnpm monorepo structure featurin
 - **Authentication System**: JWT-based auth with registration/login endpoints
 - **Task Management**: Complete CRUD operations with user ownership
   - `GET /tasks` - Fetch user's tasks
-  - `POST /tasks` - Create new task
+  - `POST /tasks` - Create new task with importance levels
   - `PUT /tasks/:id` - Update task details
   - `PUT /tasks/:id/complete` - Complete task and award XP
   - `DELETE /tasks/:id` - Delete task
-- **XP System**: Automatic XP rewards for task completion
+- **XP System**: Automatic XP rewards based on task importance
+- **Importance System**: 5 levels (Low: 5XP, Medium: 10XP, High: 15XP, Critical: 25XP, Epic: 40XP)
 - **User Management**: User profile with XP tracking
-- **Database**: SQLite with Prisma ORM, proper schema with relationships
+- **Database**: SQLite with Prisma ORM, updated schema with importance field
 
 #### Mobile App (Expo React Native)
 - **Authentication**: Login/Register screens with JWT token persistence
@@ -26,13 +27,14 @@ A comprehensive productivity application with a pnpm monorepo structure featurin
   - Recent tasks list
   - Real-time data from API
 - **Task Management**: Full CRUD functionality
-  - View all tasks with completion status
-  - Add new tasks with XP weight
+  - View all tasks with completion status and importance levels
+  - Add new tasks with importance selection (auto-calculates XP)
   - Complete tasks (awards XP automatically)
   - Delete tasks with confirmation
+- **Importance UI**: MMORPG-themed importance selection with fantasy icons
 - **Navigation**: Tab-based navigation with Expo Router v3
 - **State Management**: React Query v5 for API data fetching
-- **UI/UX**: Modern dark theme with consistent styling
+- **UI/UX**: Modern dark theme with MMORPG styling and animations
 
 #### Technical Implementation
 - **API Client**: Axios with automatic token injection and error handling
@@ -50,7 +52,8 @@ A comprehensive productivity application with a pnpm monorepo structure featurin
    - Token automatically included in all API requests
 
 2. **Task Management Flow**:
-   - Tasks are created with XP weight
+   - Tasks are created with importance levels (Low, Medium, High, Critical, Epic)
+   - Importance automatically determines XP reward (5, 10, 15, 25, 40 XP)
    - Completing a task automatically awards XP
    - XP updates trigger level recalculation
    - Dashboard shows real-time progress
@@ -71,8 +74,7 @@ A comprehensive productivity application with a pnpm monorepo structure featurin
 ### 🚧 What's Missing
 
 #### High Priority
-- **Task Creation UI**: Add task form in mobile app
-- **Task Editing**: Edit task details (title, due date, XP weight)
+- **Task Editing**: Edit task details (title, due date, importance) - UI ready, API needs update
 - **Due Date Handling**: Task scheduling and reminders
 - **Task Categories**: Organize tasks by type/project
 
@@ -141,10 +143,10 @@ pnpm start
 ```
 
 ### Environment Variables
-Create a `.env` file in the root directory:
+There is a `.env` file in the root directory that needs to be configured with:
 ```env
 # Database
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="file:./apps/api/prisma/dev.db"
 
 # JWT
 JWT_SECRET="your-secret-key"
@@ -183,8 +185,8 @@ ProductivityLeveling/
 
 ## 🎯 Next Steps
 
-1. **Implement Task Creation UI** in mobile app
-2. **Add Task Editing** functionality
+1. **✅ Task Creation UI** - COMPLETED with importance selection
+2. **Add Task Editing** functionality (edit title, due date, importance)
 3. **Integrate Chat AI** for productivity assistance
 4. **Add Push Notifications** for task reminders
 5. **Implement Nutrition Tracking** features
@@ -193,5 +195,6 @@ ProductivityLeveling/
 
 - The mobile app uses `localhost` for development but should be configured with the host machine's IP for device testing
 - All API endpoints require JWT authentication
-- XP is automatically calculated and awarded on task completion
-- The dashboard provides real-time updates of user progress and task statistics 
+- XP is automatically calculated based on task importance and awarded on task completion
+- The dashboard provides real-time updates of user progress and task statistics
+- Task importance levels: Low (5XP), Medium (10XP), High (15XP), Critical (25XP), Epic (40XP) 

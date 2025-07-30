@@ -2,6 +2,18 @@ import { View, Text, Pressable, Alert } from "react-native";
 import { useCompleteTask, useDeleteTask } from "../api/tasks";
 import { Task } from "../types";
 
+// Helper function to get importance color
+const getImportanceColor = (importance: string) => {
+  switch (importance) {
+    case 'Low': return '#4CAF50';
+    case 'Medium': return '#FFD54F';
+    case 'High': return '#FF9800';
+    case 'Critical': return '#F44336';
+    case 'Epic': return '#9C27B0';
+    default: return '#FFD54F';
+  }
+};
+
 interface TaskItemProps {
   task: Task;
 }
@@ -50,9 +62,29 @@ export default function TaskItem({ task }: TaskItemProps) {
             Due: {new Date(task.due).toLocaleDateString()}
           </Text>
         )}
-        <Text style={{ color: '#FFD54F', fontSize: 12, marginTop: 4 }}>
-          +{task.xpWeight} XP
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+          <Text style={{ color: '#FFD54F', fontSize: 12, marginRight: 8 }}>
+            +{task.xpWeight} XP
+          </Text>
+          {task.importance && (
+            <View style={{
+              backgroundColor: getImportanceColor(task.importance) + '20',
+              paddingHorizontal: 6,
+              paddingVertical: 2,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: getImportanceColor(task.importance),
+            }}>
+              <Text style={{ 
+                color: getImportanceColor(task.importance), 
+                fontSize: 10, 
+                fontWeight: 'bold',
+              }}>
+                {task.importance}
+              </Text>
+            </View>
+          )}
+        </View>
       </Pressable>
       
       <Pressable 
