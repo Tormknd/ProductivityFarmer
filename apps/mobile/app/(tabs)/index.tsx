@@ -1,15 +1,20 @@
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { useState } from 'react';
 import { useAuth } from '../../src/context/AuthContext';
 import { useUser } from '../../src/api/xp';
 import { useTasks } from '../../src/api/tasks';
+import { useNutritionGoals } from '../../src/api/nutrition';
 import { calcLevel } from '../../src/lib/xp';
 import XPBar from '../../src/components/XPBar';
 import MMORPGIcon, { ICON_NAMES } from '../../src/components/MMORPGIcons';
+import ProfileGoals from '../../src/components/ProfileGoals';
 
 export default function Dashboard() {
   const { user: authUser, token } = useAuth();
   const { data: user, isLoading: userLoading, error: userError } = useUser();
   const { data: tasks, isLoading: tasksLoading, error: tasksError } = useTasks();
+  const { data: nutritionGoals } = useNutritionGoals();
+  const [showProfileGoals, setShowProfileGoals] = useState(false);
 
   const recentTasks = tasks?.slice(0, 3) || [];
   const completedTasks = tasks?.filter(task => task.completed) || [];
@@ -24,11 +29,34 @@ export default function Dashboard() {
   return (
     <View style={{ flex: 1, backgroundColor: '#121212' }}>
       <ScrollView style={{ padding: 20 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-          <MMORPGIcon name={ICON_NAMES.HOME} size={28} color="#FFD54F" style={{ marginRight: 12 }} />
-          <Text style={{ color: '#FFD54F', fontSize: 24, fontWeight: 'bold' }}>
-            Dashboard
-          </Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <MMORPGIcon name={ICON_NAMES.HOME} size={28} color="#FFD54F" style={{ marginRight: 12 }} />
+            <Text style={{ color: '#FFD54F', fontSize: 24, fontWeight: 'bold' }}>
+              Dashboard
+            </Text>
+          </View>
+          
+          {token && (
+            <TouchableOpacity 
+              onPress={() => setShowProfileGoals(true)}
+              style={{ 
+                flexDirection: 'row', 
+                alignItems: 'center', 
+                backgroundColor: '#1E1E1E',
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: '#2A2A2A'
+              }}
+            >
+              <MMORPGIcon name={ICON_NAMES.NUTRITION} size={16} color="#FFD54F" style={{ marginRight: 6 }} />
+              <Text style={{ color: '#FFD54F', fontSize: 14, fontWeight: '500' }}>
+                Goals
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
         
         {token ? (
@@ -89,6 +117,57 @@ export default function Dashboard() {
               </View>
             </View>
 
+            {/* Nutrition Goals Summary */}
+            <View style={{ 
+              backgroundColor: '#1E1E1E', 
+              padding: 20, 
+              borderRadius: 16, 
+              marginBottom: 20 
+            }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <MMORPGIcon name={ICON_NAMES.NUTRITION} size={20} color="#FFD54F" style={{ marginRight: 8 }} />
+                  <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' }}>
+                    Nutrition Goals
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => setShowProfileGoals(true)}>
+                  <MMORPGIcon name={ICON_NAMES.EDIT} size={16} color="#FFD54F" />
+                </TouchableOpacity>
+              </View>
+              
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+                <View style={{ alignItems: 'center', flex: 1 }}>
+                  <Text style={{ color: '#FF6B35', fontSize: 20, fontWeight: 'bold' }}>
+                    {nutritionGoals?.targetKcal || 2000}
+                  </Text>
+                  <Text style={{ color: '#B0BEC5', fontSize: 12 }}>Calories</Text>
+                </View>
+                <View style={{ alignItems: 'center', flex: 1 }}>
+                  <Text style={{ color: '#4CAF50', fontSize: 20, fontWeight: 'bold' }}>
+                    {nutritionGoals?.targetProtein || 150}g
+                  </Text>
+                  <Text style={{ color: '#B0BEC5', fontSize: 12 }}>Protein</Text>
+                </View>
+                <View style={{ alignItems: 'center', flex: 1 }}>
+                  <Text style={{ color: '#FFD54F', fontSize: 20, fontWeight: 'bold' }}>
+                    {nutritionGoals?.targetCarbs || 250}g
+                  </Text>
+                  <Text style={{ color: '#B0BEC5', fontSize: 12 }}>Carbs</Text>
+                </View>
+                <View style={{ alignItems: 'center', flex: 1 }}>
+                  <Text style={{ color: '#FF6B35', fontSize: 20, fontWeight: 'bold' }}>
+                    {nutritionGoals?.targetFat || 65}g
+                  </Text>
+                  <Text style={{ color: '#B0BEC5', fontSize: 12 }}>Fat</Text>
+                </View>
+              </View>
+              
+              <Text style={{ color: '#8BC34A', fontSize: 14, textAlign: 'center' }}>
+                Fiber: {nutritionGoals?.targetFiber || 25}g
+              </Text>
+            </View>
+
             {/* Recent Tasks */}
             <View style={{ 
               backgroundColor: '#1E1E1E', 
@@ -134,6 +213,12 @@ export default function Dashboard() {
           </Text>
         )}
       </ScrollView>
+      
+      {/* Profile Goals Modal */}
+      <ProfileGoals 
+        visible={showProfileGoals} 
+        onClose={() => setShowProfileGoals(false)} 
+      />
     </View>
   );
 } 

@@ -7,6 +7,7 @@ import mealsRouter from "./routes/meals";
 import foodsRouter from "./routes/foods";
 import xpRouter from "./routes/xp";
 import chatRouter from "./routes/chat";
+import nutritionRouter from "./routes/nutrition";
 
 // Debug environment variables
 console.log("Environment variables check:");
@@ -51,6 +52,7 @@ app.use("/meals", mealsRouter);
 app.use("/foods", foodsRouter);
 app.use("/xp", xpRouter);
 app.use("/chat", chatRouter);
+app.use("/nutrition", nutritionRouter);
 
 const port = parseInt(process.env.PORT || '4000', 10);
 app.listen(port, "0.0.0.0", () => {

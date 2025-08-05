@@ -3,6 +3,7 @@ import { View, Modal, Button, Text, Alert } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { useApi } from "../api/client";
 import { useFoodByBarcode } from "../api/foods";
+import { formatNutritionValue } from "../lib/nutrition";
 
 export default function BarcodeScanner() {
   const [open, setOpen] = useState(false);
@@ -19,7 +20,7 @@ export default function BarcodeScanner() {
     try {
       const res = await api.get(`/foods/barcode/${data}`);
       if (res.data) {
-        Alert.alert('Food Found!', `${res.data.name} - ${res.data.kcal} kcal`);
+        Alert.alert('Food Found!', `${res.data.name} - ${formatNutritionValue(res.data.kcal)} kcal`);
       }
     } catch (error) {
       Alert.alert('Food Not Found', 'This barcode is not in our database. Would you like to add it?');

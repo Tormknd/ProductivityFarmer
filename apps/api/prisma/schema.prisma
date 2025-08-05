@@ -8,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  name         String?
-  xp           Int      @default(0)
-  tasks        Task[]
-  meals        Meal[]
-  foods        Food[]   @relation("UserFoods")
-  xpLogs       XPLog[]
-  createdAt    DateTime @default(now())
+  id             String          @id @default(cuid())
+  email          String          @unique
+  passwordHash   String
+  name           String?
+  xp             Int             @default(0)
+  tasks          Task[]
+  meals          Meal[]
+  foods          Food[]          @relation("UserFoods")
+  xpLogs         XPLog[]
+  chatMessages   ChatMessage[]
+  nutritionGoal  NutritionGoal?
+  createdAt      DateTime        @default(now())
 }
 
 model Task {
@@ -32,26 +34,48 @@ model Task {
 }
 
 model Food {
-  id      String   @id @default(cuid())
-  name    String
-  barcode String?  @unique
-  kcal    Int
-  protein Int
-  carbs   Int
-  fat     Int
-  owner   User?    @relation("UserFoods", fields: [ownerId], references: [id])
-  ownerId String?
-  meals   Meal[]
+  id          String   @id @default(cuid())
+  name        String
+  barcode     String?  @unique
+  kcal        Int
+  protein     Float    @default(0)
+  carbs       Float    @default(0)
+  fat         Float    @default(0)
+  fiber       Float    @default(0)
+  sugar       Float    @default(0)
+  sodium      Float    @default(0)
+  servingSize String   @default("100g")
+  owner       User?    @relation("UserFoods", fields: [ownerId], references: [id])
+  ownerId     String?
+  meals       Meal[]
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
 }
 
 model Meal {
-  id       String   @id @default(cuid())
-  user     User     @relation(fields: [userId], references: [id])
-  userId   String
-  food     Food     @relation(fields: [foodId], references: [id])
-  foodId   String
-  quantity Float    @default(1)
-  loggedAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  food      Food     @relation(fields: [foodId], references: [id])
+  foodId    String
+  quantity  Float    @default(1)
+  mealType  String   @default("snack") // breakfast, lunch, dinner, snack
+  loggedAt  DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model NutritionGoal {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String   @unique
+  targetKcal   Int      @default(2000)
+  targetProtein Float   @default(150)
+  targetCarbs  Float    @default(250)
+  targetFat    Float    @default(65)
+  targetFiber  Float    @default(25)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model XPLog {
@@ -60,5 +84,14 @@ model XPLog {
   userId    String
   amount    Int
   reason    String
+  createdAt DateTime @default(now())
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  role      String   // 'user' or 'assistant'
+  content   String
   createdAt DateTime @default(now())
 }
