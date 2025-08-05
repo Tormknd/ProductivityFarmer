@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await SecureStore.deleteItemAsync("token");
       
       const api = axios.create({
-        baseURL: Constants.expoConfig?.extra?.apiUrl || "http://localhost:4000",
+        baseURL: Constants.expoConfig?.extra?.apiUrl || "http://192.168.1.22:4000",
       });
       
       // First, try to register the user (in case they don't exist)
@@ -90,6 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
       } catch (error: any) {
         // User might already exist, that's okay
+        console.log("User registration skipped (might already exist):", error.response?.data?.message || "Unknown error");
       }
       
       // Now login to get a real token
@@ -102,6 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(MOCK_USER);
       await SecureStore.setItemAsync("token", data.token);
     } catch (error: any) {
+      console.error("Quick login failed:", error.response?.data || error.message);
       throw error;
     }
   };

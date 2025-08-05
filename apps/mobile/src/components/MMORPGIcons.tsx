@@ -50,7 +50,7 @@ const MMORPG_ICONS: { [key: string]: { symbol: string; style?: any } } = {
   'completed': { symbol: '✅', style: { fontSize: 0.8 } },
   'pending': { symbol: '⏳', style: { fontSize: 0.8 } },
   'failed': { symbol: '❌', style: { fontSize: 0.8 } },
-  'in-progress': { symbol: '🔄', style: { fontSize: { fontSize: 0.8 } } },
+  'in-progress': { symbol: '🔄', style: { fontSize: 0.8 } },
   
   // Fantasy Elements
   'sword': { symbol: '🗡️', style: { fontSize: 0.8 } },

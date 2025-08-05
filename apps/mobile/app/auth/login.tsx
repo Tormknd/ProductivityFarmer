@@ -33,8 +33,12 @@ export default function Login() {
   };
 
   const quickLogin = async () => {
-    await loginWithMockUser();
-    router.replace("/(tabs)");
+    try {
+      await loginWithMockUser();
+      router.replace("/(tabs)");
+    } catch (error: any) {
+      Alert.alert("Quick Login Failed", error.response?.data?.message || error.message || "Failed to login with test user");
+    }
   };
 
   const clearToken = async () => {

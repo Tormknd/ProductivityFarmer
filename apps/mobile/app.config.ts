@@ -32,6 +32,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-router'
   ],
   extra: {
-    apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://10.139.19.193:4000'
+    apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.22:4000'
   }
 }); 

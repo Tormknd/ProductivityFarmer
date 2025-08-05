@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import Constants from "expo-constants";
 
 const api = axios.create({
-  baseURL: Constants.expoConfig?.extra?.apiUrl || "http://10.139.19.193:4000",
+  baseURL: Constants.expoConfig?.extra?.apiUrl || "http://192.168.1.22:4000",
 });
 
 export const useApi = () => {
